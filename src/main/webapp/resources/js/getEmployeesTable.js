@@ -15,9 +15,19 @@ class Main extends React.Component {
             }.bind(this)
         });
     }
+    _orderEmployees() {
+        this.state.employees.sort(function(empA, empB){
+            if (empA.empId < empB.empId)
+                return -1;
+            else if (empA.empId > empB.empId)
+                return 1;
+            return 0;
+        });
+    }
     componentDidMount() {
         this._loadEmployees();
     }
+    
     render() {
         //var self = this;
         var data=["EmpID","Name","Status","Tenure","Phone","Email","DOJ",
@@ -33,6 +43,7 @@ class Main extends React.Component {
                         <tr>{tableData}</tr>
                     </thead>
                     <tbody>
+                        {this._orderEmployees()}
                         {this.state.employees.map(function(employee) {
                             var color = '';
                             if (employee.status === "Onboarding Completed")
@@ -44,7 +55,7 @@ class Main extends React.Component {
                             var colorStyle = { backgroundColor: color };
                             return (
                                 <tr className="dropdown" key={employee.empId}>
-                                    <td>{employee.empId}</td>
+                                    <td>{employee.empId.toString()}</td>
                                     <td>{employee.name}</td>
                                     <td style={colorStyle}>{employee.status}</td>
                                     <td>{employee.tenure}</td>
@@ -86,5 +97,5 @@ class Main extends React.Component {
 
 ReactDOM.render(
     <Main />,
-    document.getElementById('react')
+    document.getElementById('reactContent')
 );

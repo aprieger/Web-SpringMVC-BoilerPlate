@@ -20,13 +20,18 @@ import com.springmvc.dto.Job2;
 @Controller
 @RequestMapping( value = "/job")
 public class JobWebController {
-	@RequestMapping(value = "/all", method = RequestMethod.GET)
-	public String allJobs(Model model){
+	@RequestMapping(value = "/table", method = RequestMethod.GET)
+	public String getJobsTable(Model model){
 		model.addAttribute("job", new Job2());
-		return "allJobs";
+		return "jobsTable";
+	}
+	@RequestMapping(value = "/order", method = RequestMethod.GET)
+	public String getJobsOrder(Model model){
+		model.addAttribute("job", new Job2());
+		return "jobsOrder";
 	}
 	@RequestMapping(value = "/map", method = RequestMethod.GET)
-	public String getSubwayMap(){
-		return "jobMap";
+	public String getJobsMap(){
+		return "jobsMap";
 	}
 }

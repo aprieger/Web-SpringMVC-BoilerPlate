@@ -6,8 +6,8 @@ class Map extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            jobs: [],
-            circlesArray: [],
+            employees: [],
+            nodes: [],
             scale: 80,
             nodeLineCount: 0,
             nodeX: 0,
@@ -17,12 +17,12 @@ class Map extends React.Component {
             nodeLineWidth: 3
         };
     }
-    _loadJobs() {
+    _loadEmployees() {
         $.ajax({
-            url: 'http://localhost:8080/job2/all',
+            url: 'http://localhost:8080/employee/all',
             dataType: 'json',
             success: function(data) {
-                this.setState({jobs: data});
+                this.setState({employees: data});
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error('#Get Error', status, err.toString());
@@ -67,7 +67,7 @@ class Map extends React.Component {
         context.fill();
         context.closePath();
     }
-    _drawNode(nodeFill, nodeJob) {
+    _drawNode(fill, emp) {
     	if (canvas.width < (this.state.nodeLineCount+2)*this.state.scale) {
             this.state.nodeLineCount=0;
             this.state.nodeY++;
@@ -90,18 +90,25 @@ class Map extends React.Component {
     	context.strokeStyle = "#000";
     	context.lineWidth=this.state.nodeLineWidth;
     	context.arc(x, y, this.state.nodeRadius, 0, 2 * Math.PI);
-    	context.fillStyle = nodeFill;
+    	context.fillStyle = fill;
     	context.fill();
     	context.stroke();
-        this.state.circlesArray.push({
+        this.state.nodes.push({
             id: x + "-" + y,
-            jobId: nodeJob.id,
-            category: nodeJob.category,
-            type: nodeJob.type,
-            ref: nodeJob.ref,
-            state: nodeJob.state,
-            priority: nodeJob.priority,
-            dependencies: nodeJob.dependencies,
+            empId: emp.empId,
+            name: emp.name,
+            tenure: emp.tenure,
+            status: emp.status,
+            phone: emp.phone,
+            email: emp.email,
+            doj: emp.doj,
+            wl: emp.wl,
+            hl: emp.hl,
+            cl: emp.cl,
+            rmid: emp.rmid,
+            roleid: emp.roleid,
+            vertid: emp.vertid,
+            acctid: emp.acctid,
             x: x,
             y: y,
             radius: this.state.nodeRadius
@@ -143,20 +150,20 @@ class Map extends React.Component {
     }
     _addNodes(){
         let self = this;
-        this.state.jobs.map(function(job) {
+        this.state.employees.map(function(employee) {
             var color = '#fff';
-            if (job.state === 1)
+            if (employee.status === "Onboarding Completed")
                 color = '#70f441';
-            else if (job.state === 0)
+            else if (employee.status === "Onboarding In Progress")
                 color = '#f4dc42';
-            else if (job.state === 2)
+            else if (employee.status === "Onboarding Cancelled")
                 color = '#f45f41';
-            self._drawNode(color, job);
+            self._drawNode(color, employee);
         });
-        circles = this.state.circlesArray;
+        circles = this.state.nodes;
     }
     componentWillMount() {
-        this._loadJobs();
+        this._loadEmployees();
         this._drawGrid();
     }
     componentDidMount() {
@@ -166,21 +173,24 @@ class Map extends React.Component {
         return (
             <div>
                 {this._addNodes()}
-                {this.state.circlesArray.map(function(circle) {
+                {this.state.nodes.map(function(circle) {
                     var circleId = circle.id;
                     return (
                         <div id={circleId+"-content"} className="dropdown-content" key={circleId+"-content"}>
-                            <div>Category: {circle.category}</div>
-                            <div>Type: {circle.type}</div>
-                            <div>Reference: {circle.ref}</div>
-                            <div>State: {circle.state}</div>
-                            <div>Priority: {circle.priority}</div>
-                            <div>Dependencies:</div>
-                            {circle.dependencies.map(function(ref) {
-                            	return (
-                                    <div>{ref}</div>
-                                );
-                            })}
+                            <div>Employee Id:{circle.empId}</div>
+                            <div>Name:{circle.name}</div>
+                            <div>Tenure: {circle.tenure}</div>
+                            <div>Status: {circle.status}</div>
+                            <div>Phone: {circle.phone}</div>
+                            <div>Email: {circle.email}</div>
+                            <div>DOJ: {circle.doj}</div>
+                            <div>WL: {circle.wl}</div>
+                            <div>HL: {circle.hl}</div>
+                            <div>CL: {circle.cl}</div>
+                            <div>RMID: {circle.rmid}</div>
+                            <div>RoleID: {circle.roleid}</div>
+                            <div>VertID: {circle.vertid}</div>
+                            <div>AcctID: {circle.acctid}</div>
                         </div>
                     );
                 })}
@@ -190,7 +200,7 @@ class Map extends React.Component {
 }
 ReactDOM.render(
     <Map />,
-    document.getElementById('react')
+    document.getElementById('reactContent')
 );
 
 //Handle the user hovering over a particular node
@@ -208,8 +218,8 @@ canvas.onmousemove = function (e) {
         context.beginPath();
         context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
         if (context.isPointInPath(x, y)) {
-            $('#'+circle.id+'-content').css('left', x+20+"px");
-            $('#'+circle.id+'-content').css('top', y+20+"px");
+            $('#'+circle.id+'-content').css('left', x+80+"px");
+            $('#'+circle.id+'-content').css('top', y+150+"px");
             $('#'+circle.id+'-content').css('display', 'block');
             break;
         }

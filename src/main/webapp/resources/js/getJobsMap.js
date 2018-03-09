@@ -10,8 +10,9 @@ class Map extends React.Component {
             topJobs: [],
             drawnJobs: [],
             nodes: [],
-            scale: 120,
+            scale: 0,
             nodeRadius: 10,
+            longestNodeBranch: 0,
             innerLineWidth: 3,
             outerLineWidth: 6
         };
@@ -31,10 +32,31 @@ class Map extends React.Component {
         });
     }
     
+    //the main render function that handles the generation and organization
+    //of the job nodes
+    _renderNodes() {
+        this.state.scale = 1000 / this.state.jobs.length;
+        this.state.nodeRadius = this.state.scale / 10;
+        
+        this._drawGrid();
+        this._getTopNodes();
+        if (this.state.topJobs.length > 0) {
+            this._drawChildNodes(this.state.topJobs, canvas.width / 2, 0, 
+                    canvas.width);
+        }
+        else
+            this._drawChildNodes(this.state.jobs, canvas.width / 2, 0, 
+                    canvas.width);
+        this._drawLines();
+        
+        circles = this.state.nodes;
+    }
+    
     _drawGrid() {
         context.fillStyle="#000";
-        context.canvas.width = window.innerWidth-(window.innerWidth*.1);
-        context.canvas.height = window.innerHeight-(window.innerHeight*.1);
+        context.canvas.width = window.innerWidth * .9;
+        context.canvas.height = window.innerHeight * this.state.scale / 100;
+        //context.canvas.height = this.state.jobs.length * 100;
         context.beginPath();
         var scale = this.state.scale;
         var height = window.innerHeight*scale;
@@ -67,16 +89,6 @@ class Map extends React.Component {
         context.stroke();
         context.fill();
         context.closePath();
-    }
-    
-    //the main render function that handles the generation and organization
-    //of the job nodes
-    _renderNodes() {
-        this._getTopNodes();
-        this._drawChildNodes(this.state.topJobs, canvas.width / 2, 0, 
-                canvas.width);
-        this._drawLines();
-        circles = this.state.nodes;
     }
     
     //gets the jobs that are not children of any other jobs
@@ -127,7 +139,8 @@ class Map extends React.Component {
                 var xPos = Math.round((nodeIndex / nodeCount) * parentWidth 
                     + (parentX - ( parentWidth / 2))
                     + (( parentWidth / nodeCount) / 2));
-                self._drawChildNodes(childJobs, xPos, yPos, parentWidth/nodeCount);
+                self._drawChildNodes(childJobs, xPos, yPos, 
+                        parentWidth/nodeCount);
             }
             nodeIndex += 1;
         });
@@ -147,27 +160,34 @@ class Map extends React.Component {
         else if (job.state === 2)
             fill = '#f45f41';
         
+        var xRounded = Math.round(xPos);
+        var yRounded = Math.round(yPos*this.state.scale);
+        
         //draw the node
         context.beginPath();
     	context.strokeStyle = "#000";
     	context.lineWidth=this.state.innerLineWidth;
-    	context.arc(xPos, yPos*this.state.scale, this.state.nodeRadius, 0, 2 * Math.PI);
+    	context.arc(xRounded, yRounded, this.state.nodeRadius, 0, 2 * Math.PI);
     	context.fillStyle = fill;
     	context.fill();
+        context.fillStyle = "#000";
+        context.font = this.state.scale/10 + "px Arial";
+        context.fillText(job.type, xRounded + (this.state.scale / 10),
+                yRounded + (this.state.scale / 10));
     	context.stroke();
         
         //push the drawn node to the nodes array
         this.state.nodes.push({
-            id: xPos + "-" + yPos*this.state.scale,
+            id: xRounded + "-" + yRounded,
             jobId: job.id,
             category: job.category,
             type: job.type,
             ref: job.ref,
             state: job.state,
-            priority: job.priority,
+            scheduled: job.scheduled,
             dependencies: job.dependencies,
-            x: xPos,
-            y: yPos*this.state.scale,
+            x: xRounded,
+            y: yRounded,
             radius: this.state.nodeRadius
         });
     }
@@ -194,6 +214,7 @@ class Map extends React.Component {
         return (childJobs);
     }
     
+    //for each child dependency, draw a line to that node
     _drawLines() {
         var self = this;
         this.state.nodes.map(function(nodeStart) {
@@ -210,48 +231,68 @@ class Map extends React.Component {
         });
     }
     
+    //Handle drawing a line from one node to another, showing dependency
     _drawLine(startX, startY, endX, endY){
         var headlen = 15;   // length of head in pixels
         var angle = Math.atan2(endY-startY,endX-startX);
         context.beginPath();
+        context.strokeStyle = "#000";
+        context.lineWidth=this.state.innerLineWidth;
+        //Calculate the starting point on the edge of the starting node and 
+        //the ending point on the ending node
         var edgeStartX = startX + this.state.nodeRadius * Math.cos(angle);
         var edgeStartY = startY + this.state.nodeRadius * Math.sin(angle);
         var edgeEndX = endX - this.state.nodeRadius * Math.cos(angle);
         var edgeEndY = endY - this.state.nodeRadius * Math.sin(angle);
+        
+        //Draw line from start to end
         context.moveTo(edgeStartX, edgeStartY);
         context.lineTo(edgeEndX, edgeEndY);
-        context.lineTo(edgeEndX-headlen*Math.cos(angle-Math.PI/6), 
-                edgeEndY-headlen*Math.sin(angle-Math.PI/6));
-        context.moveTo(edgeEndX, edgeEndY);
-        context.lineTo(edgeEndX-headlen*Math.cos(angle+Math.PI/6), 
-                edgeEndY-headlen*Math.sin(angle+Math.PI/6));
-    	context.strokeStyle = "#000";
-    	context.lineWidth = this.state.outerLineWidth;
+        context.strokeStyle = "#000";
         context.stroke();
-        context.strokeStyle = "#42cbf4";
-    	context.lineWidth = this.state.innerLineWidth;
-    	context.stroke();
+        
+        //Draw a circle
+        context.beginPath();
+        context.lineWidth=this.state.innerLineWidth/2;
+    	context.arc(edgeEndX, edgeEndY, this.state.nodeRadius/1.75, 
+                0, 2 * Math.PI);
+    	context.fillStyle = "#eee";
+    	context.fill();
+        
+        //Previously used to show dependency, now using circle dependency ^
+        //Draw an arrow
+//        context.lineTo(edgeEndX-headlen*Math.cos(angle-Math.PI/6), 
+//                edgeEndY-headlen*Math.sin(angle-Math.PI/6));
+//        context.moveTo(edgeEndX, edgeEndY);
+//        context.lineTo(edgeEndX-headlen*Math.cos(angle+Math.PI/6), 
+//                edgeEndY-headlen*Math.sin(angle+Math.PI/6));
+                
+    	context.strokeStyle = "#000";
+        context.stroke();
     }
     
+    //Not currently in use, imported from the Employee Map page
     _drawLoopBackLine(){
         var lineX = this.state.nodeX*this.state.scale;
         var lineY = (this.state.nodeY-.5)*this.state.scale;
         context.beginPath();
         
         if (this.state.nodeDirection==="right") {
-            context.arc(lineX+this.state.nodeRadius, lineY, this.state.scale/2, 1.5 * Math.PI, .5 * Math.PI);
+            context.arc(lineX+this.state.nodeRadius, lineY, this.state.scale/2, 
+                    1.5 * Math.PI, .5 * Math.PI);
         }
         else if (this.state.nodeDirection==="left") {
-            context.arc(lineX-this.state.nodeRadius, lineY, this.state.scale/2, .5 * Math.PI, 1.5 * Math.PI);
+            context.arc(lineX-this.state.nodeRadius, lineY, this.state.scale/2, 
+                    .5 * Math.PI, 1.5 * Math.PI);
         }
     	context.strokeStyle = "#000";
     	context.lineWidth=this.state.innerLineWidth;
     	context.stroke();
     }
-
+    //Must load the jobs before render to gather data synchronously
     componentWillMount() {
         this._loadJobs();
-        this._drawGrid();
+        
     }
     componentDidMount() {
 
@@ -270,7 +311,7 @@ class Map extends React.Component {
                             <div>Type: {node.type}</div>
                             <div>Reference: {node.ref}</div>
                             <div>State: {node.state}</div>
-                            <div>Priority: {node.priority}</div>
+                            <div>Scheduled: {node.scheduled}</div>
                             <div>Dependencies:</div>
                             {node.dependencies.map(function(ref) {
                             	return (
@@ -284,9 +325,10 @@ class Map extends React.Component {
         );
     }
 }
+//Create a new Map object from the React class Component, and add it to the DOM
 ReactDOM.render(
     <Map />,
-    document.getElementById('react')
+    document.getElementById('reactContent')
 );
 
 //Handle the user hovering over a particular node
@@ -304,11 +346,30 @@ canvas.onmousemove = function (e) {
         context.beginPath();
         context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
         if (context.isPointInPath(x, y)) {
-            $('#'+circle.id+'-content').css('left', x+20+"px");
-            $('#'+circle.id+'-content').css('top', y+20+"px");
+            $('#'+circle.id+'-content').css('left', x+80+"px");
+            $('#'+circle.id+'-content').css('top', y+160+"px");
             $('#'+circle.id+'-content').css('display', 'block');
             break;
         }
     }
 };
+
+//call the addResizeCanvasListner to handle when the user changes the size of
+//the window
+addResizeCanvasListener();
+function addResizeCanvasListener() {
+    window.addEventListener('resize', resizeCanvas, false);
+    resizeCanvas();
+};
+function resizeCanvas() {
+    //adjust the size of the canvas based on 90% of the window width
+    canvas.width = window.innerWidth*.9;
+    
+    //clear the contents and rerender the Map
+    document.getElementById('reactContent').innerHTML = "";
+    ReactDOM.render(
+    <Map />,
+    document.getElementById('reactContent')
+);
+}
 

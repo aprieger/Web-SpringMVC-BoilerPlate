@@ -6,7 +6,7 @@ class Map extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            employees: [],
+            jobs: [],
             circlesArray: [],
             scale: 80,
             nodeLineCount: 0,
@@ -17,12 +17,12 @@ class Map extends React.Component {
             nodeLineWidth: 3
         };
     }
-    _loadEmployees() {
+    _loadJobs() {
         $.ajax({
-            url: 'http://localhost:8080/employee/all',
+            url: 'http://localhost:8080/job2/all',
             dataType: 'json',
             success: function(data) {
-                this.setState({employees: data});
+                this.setState({jobs: data});
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error('#Get Error', status, err.toString());
@@ -67,7 +67,7 @@ class Map extends React.Component {
         context.fill();
         context.closePath();
     }
-    _drawNode(nodeFill, nodeEmployee) {
+    _drawNode(nodeFill, nodeJob) {
     	if (canvas.width < (this.state.nodeLineCount+2)*this.state.scale) {
             this.state.nodeLineCount=0;
             this.state.nodeY++;
@@ -95,20 +95,13 @@ class Map extends React.Component {
     	context.stroke();
         this.state.circlesArray.push({
             id: x + "-" + y,
-            empId: nodeEmployee.empId,
-            name: nodeEmployee.name,
-            tenure: nodeEmployee.tenure,
-            status: nodeEmployee.status,
-            phone: nodeEmployee.phone,
-            email: nodeEmployee.email,
-            doj: nodeEmployee.doj,
-            wl: nodeEmployee.wl,
-            hl: nodeEmployee.hl,
-            cl: nodeEmployee.cl,
-            rmid: nodeEmployee.rmid,
-            roleid: nodeEmployee.roleid,
-            vertid: nodeEmployee.vertid,
-            acctid: nodeEmployee.acctid,
+            jobId: nodeJob.id,
+            category: nodeJob.category,
+            type: nodeJob.type,
+            ref: nodeJob.ref,
+            state: nodeJob.state,
+            priority: nodeJob.priority,
+            dependencies: nodeJob.dependencies,
             x: x,
             y: y,
             radius: this.state.nodeRadius
@@ -150,20 +143,20 @@ class Map extends React.Component {
     }
     _addNodes(){
         let self = this;
-        this.state.employees.map(function(employee) {
+        this.state.jobs.map(function(job) {
             var color = '#fff';
-            if (employee.status === "Onboarding Completed")
+            if (job.state === 1)
                 color = '#70f441';
-            else if (employee.status === "Onboarding In Progress")
+            else if (job.state === 0)
                 color = '#f4dc42';
-            else if (employee.status === "Onboarding Cancelled")
+            else if (job.state === 2)
                 color = '#f45f41';
-            self._drawNode(color, employee);
+            self._drawNode(color, job);
         });
         circles = this.state.circlesArray;
     }
     componentWillMount() {
-        this._loadEmployees();
+        this._loadJobs();
         this._drawGrid();
     }
     componentDidMount() {
@@ -177,20 +170,17 @@ class Map extends React.Component {
                     var circleId = circle.id;
                     return (
                         <div id={circleId+"-content"} className="dropdown-content" key={circleId+"-content"}>
-                            <div>Employee Id:{circle.empId}</div>
-                            <div>Name:{circle.name}</div>
-                            <div>Tenure: {circle.tenure}</div>
-                            <div>Status: {circle.status}</div>
-                            <div>Phone: {circle.phone}</div>
-                            <div>Email: {circle.email}</div>
-                            <div>DOJ: {circle.doj}</div>
-                            <div>WL: {circle.wl}</div>
-                            <div>HL: {circle.hl}</div>
-                            <div>CL: {circle.cl}</div>
-                            <div>RMID: {circle.rmid}</div>
-                            <div>RoleID: {circle.roleid}</div>
-                            <div>VertID: {circle.vertid}</div>
-                            <div>AcctID: {circle.acctid}</div>
+                            <div>Category: {circle.category}</div>
+                            <div>Type: {circle.type}</div>
+                            <div>Reference: {circle.ref}</div>
+                            <div>State: {circle.state}</div>
+                            <div>Priority: {circle.priority}</div>
+                            <div>Dependencies:</div>
+                            {circle.dependencies.map(function(ref) {
+                            	return (
+                                    <div>{ref}</div>
+                                );
+                            })}
                         </div>
                     );
                 })}
@@ -200,7 +190,7 @@ class Map extends React.Component {
 }
 ReactDOM.render(
     <Map />,
-    document.getElementById('react')
+    document.getElementById('reactContent')
 );
 
 //Handle the user hovering over a particular node

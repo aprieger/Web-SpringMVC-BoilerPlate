@@ -20,15 +20,15 @@ import com.springmvc.dto.Employee;
 @Controller
 @RequestMapping( value = "/employee")
 public class EmployeeWebController {
-	@RequestMapping(value = "/all", method = RequestMethod.GET)
-	public String allEmployees(Model model){
+	@RequestMapping(value = "/table", method = RequestMethod.GET)
+	public String getEmployeesTable(Model model){
 		model.addAttribute("employee", new Employee());
-		return "allEmployees";
+		return "employeesTable";
 	}
-	@RequestMapping(value = "/all", method = RequestMethod.POST)
+	@RequestMapping(value = "/table", method = RequestMethod.POST)
     public String postEmployeeDetails(@ModelAttribute("employee") Employee employee, BindingResult result, Model model, HttpServletRequest request) {
         if (result.hasErrors()) {
-            return "allEmployees";
+            return "employeesTable";
         }
         else {
 	        model.addAttribute("empId", employee.getEmpId());
@@ -37,10 +37,10 @@ public class EmployeeWebController {
     }
 	@RequestMapping(value = "/details", method = RequestMethod.GET)
 	public String getGmployeeDetails(Model model){
-		return "employeeDetails";
+		return "employeesDetails";
 	}
-	@RequestMapping(value = "/subwaymap", method = RequestMethod.GET)
-	public String getSubwayMap(){
-		return "subwayMap";
+	@RequestMapping(value = "/map", method = RequestMethod.GET)
+	public String getEmployeesMap(){
+		return "employeesMap";
 	}
 }
