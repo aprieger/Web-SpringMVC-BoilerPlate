@@ -14,7 +14,7 @@
     
 </head>
 <body>
-	<div id="react"></div>
+	<div id="reactContent"></div>
 	<div id="hiddenEmpId" hidden>${empId}</div>
 	<script src="${pageContext.request.contextPath}/resources/js/getEmployeeDetails.js" type = "text/babel"></script>
 </body>
