@@ -2,9 +2,70 @@ var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 context.translate(0.5, 0.5);
 var circles = [];
+var data = [];
 
 class Grid extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            jobs: [],
+            topJobs: [],
+            drawnJobs: [],
+            nodes: [],
+            scale: 30,
+            nodeRadius: 10,
+            longestNodeBranch: 0,
+            innerLineWidth: 3,
+            outerLineWidth: 6
+        };
+    }
     
+    _drawGrid() {
+        context.fillStyle="#000";
+        context.canvas.width = window.innerWidth;
+        context.canvas.height = window.innerHeight;
+        //context.canvas.height = window.innerHeight * this.state.scale / 100;
+        //context.canvas.height = this.state.jobs.length * 100;
+        context.beginPath();
+        var scale = this.state.scale;
+        var height = window.innerHeight*scale;
+        var width = window.innerWidth*scale;
+        var counter=0;
+        for (var x = .5; x < width; x+=scale) {
+            context.moveTo(x,0);
+            if (counter<10)
+                context.fillText(counter++,x-9,10);
+            else if (counter<100)
+                context.fillText(counter++,x-13,10);
+            else if (counter<1000)
+                context.fillText(counter++,x-16,10);
+            context.moveTo(x,0);
+            context.lineTo(x,height);
+        }
+        context.moveTo(width-.5,0);
+        context.lineTo(width-.5, 50);
+        counter =0;
+        for (var y=.5; y < height; y+=scale) {
+            context.moveTo(0,y);
+            context.fillText(counter++,0,y-8);
+            context.moveTo(0,y);
+            context.lineTo(height,y);
+        }
+        context.moveTo(0, height-.5);
+        context.lineTo(width, height-.5);
+        context.strokeStyle = "#eee";
+        context.lineWidth = 1;
+        context.stroke();
+        context.fill();
+        
+        context.fillStyle = "#000";
+        context.font = "30px Arial";
+        context.textAlign="center"; 
+        context.fillText("SOR", context.canvas.width/2, 50);
+        
+        
+        context.closePath();
+    } 
 };
 
 class SOR extends React.Component {
@@ -16,10 +77,6 @@ class Platform extends React.Component {
 };
 
 class Jobs extends React.Component {
-    
-};
-
-class JobsMap extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -39,8 +96,8 @@ class JobsMap extends React.Component {
         $.ajax({
             url: 'http://localhost:8080/job2/all',
             dataType: 'json',
-            success: function(data) {
-                this.setState({jobs: data});
+            success: function(respData) {
+                data=respData;
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error('#Get Error', status, err.toString());
@@ -98,51 +155,7 @@ class JobsMap extends React.Component {
         circles = this.state.nodes;
     }
     
-    _drawGrid() {
-        context.fillStyle="#000";
-        context.canvas.width = window.innerWidth * .9;
-        context.canvas.height = window.innerHeight * this.state.scale / 100;
-        //context.canvas.height = this.state.jobs.length * 100;
-        context.beginPath();
-        var scale = this.state.scale;
-        var height = window.innerHeight*scale;
-        var width = window.innerWidth*scale;
-        var counter=0;
-        for (var x = .5; x < width; x+=scale) {
-            context.moveTo(x,0);
-            if (counter<10)
-                context.fillText(counter++,x-9,10);
-            else if (counter<100)
-                context.fillText(counter++,x-13,10);
-            else if (counter<1000)
-                context.fillText(counter++,x-16,10);
-            context.moveTo(x,0);
-            context.lineTo(x,height);
-        }
-        context.moveTo(width-.5,0);
-        context.lineTo(width-.5, 50);
-        counter =0;
-        for (var y=.5; y < height; y+=scale) {
-            context.moveTo(0,y);
-            context.fillText(counter++,0,y-8);
-            context.moveTo(0,y);
-            context.lineTo(height,y);
-        }
-        context.moveTo(0, height-.5);
-        context.lineTo(width, height-.5);
-        context.strokeStyle = "#eee";
-        context.lineWidth = 1;
-        context.stroke();
-        context.fill();
-        
-        context.fillStyle = "#000";
-        context.font = "30px Arial";
-        context.textAlign="center"; 
-        context.fillText("SOR", context.canvas.width/2, 50);
-        
-        
-        context.closePath();
-    }
+    
     
     //gets the jobs that are not children of any other jobs
     _getTopNodes() {
@@ -387,8 +400,14 @@ class JobsMap extends React.Component {
             </div>
         );
     }
-}
+};
+
+class JobsMap extends React.Component {
+    
+};
+
 //Create a new Map object from the React class Component, and add it to the DOM
+ReactDOM.render(<Grid />);
 ReactDOM.render(
     <JobsMap />,
     document.getElementById('reactJobsMap')
