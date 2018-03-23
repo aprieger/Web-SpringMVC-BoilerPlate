@@ -2,6 +2,9 @@ var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 context.translate(0.5, 0.5);
 var circles = [];
+var sorX;
+var sorY;
+var nodeDrawn = 0;
 
 class Grid extends React.Component {
     
@@ -49,20 +52,6 @@ class JobsMap extends React.Component {
         });
     }
     
-    _loadJobsCORS() {            
-        var request = new XMLHttpRequest();
-        request.open('GET', 'http://localhost:8080/job2/all', false);
-        request.onreadystatechange = function() {
-        		if (request.readyState==4) {
-        			alert(request.responseText);
-        		}
-        	};
-        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        request.setRequestHeader("Content-length", 0);
-        request.setRequestHeader("Connection", "close");
-        request.send();
-    }
-    
     _loadLocalJobs() {
         var resourcesPath= document.getElementById("resourcesPath").getAttribute("href");
         $.ajax({
@@ -100,7 +89,7 @@ class JobsMap extends React.Component {
     
     _drawGrid() {
         context.fillStyle="#000";
-        context.canvas.width = window.innerWidth * .9;
+        context.canvas.width = window.innerWidth;
         context.canvas.height = window.innerHeight * this.state.scale / 100;
         //context.canvas.height = this.state.jobs.length * 100;
         context.beginPath();
@@ -135,11 +124,26 @@ class JobsMap extends React.Component {
         context.stroke();
         context.fill();
         
+        sorX = context.canvas.width/2;
+        sorY = 50; 
+      
+        var fill = '#ddd';
+        var xRounded = Math.round(sorX);
+        var yRounded = Math.round(sorY);
+        
+        //draw the node
+        context.beginPath();
+        context.strokeStyle = "#000";
+        context.lineWidth=3;
+        context.arc(xRounded, yRounded, 10, 0, 2 * Math.PI);
+        context.stroke();
+        context.fillStyle = fill;
+        context.fill();
+        
         context.fillStyle = "#000";
         context.font = "30px Arial";
         context.textAlign="center"; 
-        context.fillText("SOR", context.canvas.width/2, 50);
-        
+        context.fillText("Triumph", sorX, sorY);
         
         context.closePath();
     }
@@ -219,21 +223,22 @@ class JobsMap extends React.Component {
         
         //draw the node
         context.beginPath();
-    	context.strokeStyle = "#000";
-    	context.lineWidth=this.state.innerLineWidth;
-    	context.arc(xRounded, yRounded, this.state.nodeRadius, 0, 2 * Math.PI);
-    	context.fillStyle = fill;
-    	context.fill();
+        context.strokeStyle = "#000";
+        context.lineWidth=this.state.innerLineWidth;
+        context.arc(xRounded, yRounded, this.state.nodeRadius, 0, 2 * Math.PI);
+        context.fillStyle = fill;
+        context.fill();
+        
         context.fillStyle = "#000";
-        var jobName = job.type;
-        if (jobName.length > 15) {
-            jobName = jobName.substring(0,15) + "...";
+        var jobLabel = job.category + "/" + job.ref;
+        if (jobLabel.length > 15) {
+            jobLabel = jobLabel.substring(0,15) + "...";
         }
         context.textAlign="left"; 
-        context.font = this.state.scale/10 + "px Arial";
-        context.fillText(jobName, xRounded + (this.state.scale / 10),
-            yRounded + (this.state.scale / 10));
-    	context.stroke();
+        context.font = this.state.scale/8 + "px Arial";
+        context.fillText(jobLabel, xRounded + (this.state.scale / 6),
+            yRounded + (this.state.scale / 6));
+        context.stroke();
         
         //push the drawn node to the nodes array
         this.state.nodes.push({
@@ -283,6 +288,10 @@ class JobsMap extends React.Component {
                     //alert(depRef+" == "+self.state.nodes[i].ref);
                 		//if (JSON.parse(depRef).ref === self.state.nodes[i].ref) {
                     if (depRef.ref === self.state.nodes[i].ref) {
+                        self.state.topJobs.map(function(topJobTest) {
+                            if (topJobTest.ref === nodeStart.ref)
+                                self._drawLine(sorX, sorY, nodeStart.x, nodeStart.y);
+                        });
                         self._drawLine(nodeStart.x, nodeStart.y, 
                                 self.state.nodes[i].x, self.state.nodes[i].y);
                         break;
@@ -332,29 +341,10 @@ class JobsMap extends React.Component {
         context.stroke();
     }
     
-    //Not currently in use, imported from the Employee Map page
-    _drawLoopBackLine(){
-        var lineX = this.state.nodeX*this.state.scale;
-        var lineY = (this.state.nodeY-.5)*this.state.scale;
-        context.beginPath();
-        
-        if (this.state.nodeDirection==="right") {
-            context.arc(lineX+this.state.nodeRadius, lineY, this.state.scale/2, 
-                    1.5 * Math.PI, .5 * Math.PI);
-        }
-        else if (this.state.nodeDirection==="left") {
-            context.arc(lineX-this.state.nodeRadius, lineY, this.state.scale/2, 
-                    .5 * Math.PI, 1.5 * Math.PI);
-        }
-    	context.strokeStyle = "#000";
-    	context.lineWidth=this.state.innerLineWidth;
-    	context.stroke();
-    }
     //Must load the jobs before render to gather data synchronously
     componentWillMount() {
-        this._loadLocalJobs();
-        //this._loadJobs();
-        //this._loadJobsCORS();
+        //this._loadLocalJobs();
+        this._loadJobs();
     }
     componentDidMount() {
 
@@ -364,16 +354,15 @@ class JobsMap extends React.Component {
             <div>
                 {this._renderNodes()}
                 {this.state.nodes.map(function(node) {
+                    console.log(node.ref);
                     var nodeId = node.id;
                     return (
                         <div id={nodeId+"-content"} 
                                 className="dropdown-content" 
                                 key={nodeId+"-content"}>
-                            <div>Category: {node.category}</div>
-                            <div>Type: {node.type}</div>
-                            <div>Reference: {node.ref}</div>
+                            <div>Platform: {node.category}</div>
+                            <div>Job Name: {node.ref}</div>
                             <div>State: {node.state}</div>
-                            <div>Scheduled: {node.scheduled}</div>
                             <div>Dependencies:</div>
                             {node.dependencies.map(function(ref) {
                             	return (
@@ -409,13 +398,15 @@ canvas.onmousemove = function (e) {
         context.beginPath();
         context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
         if (context.isPointInPath(x, y)) {
-            $('#'+circle.id+'-content').css('left', x+80+"px");
-            $('#'+circle.id+'-content').css('top', y+160+"px");
+            $('#'+circle.id+'-content').css('left', x+"px");
+            $('#'+circle.id+'-content').css('top', y+260+"px");
             $('#'+circle.id+'-content').css('display', 'block');
             break;
         }
     }
 };
+
+
 
 //call the addResizeCanvasListner to handle when the user changes the size of
 //the window
