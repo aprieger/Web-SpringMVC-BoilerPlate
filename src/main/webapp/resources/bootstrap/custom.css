@@ -82,6 +82,13 @@ li a:hover:not(.active) {
     height: 100%;
     float: left;
 }
+.legend {
+	margin-left: 2em;
+	width: auto;
+}
+.legend-td {
+	padding-left: 1em;
+}
 
 #reactButtons {
     justify-content: center;

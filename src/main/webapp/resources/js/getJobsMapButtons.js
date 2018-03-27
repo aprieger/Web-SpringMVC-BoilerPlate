@@ -10,7 +10,7 @@ class JobsMapButtons extends React.Component {
     
     _loadJobs() {
         $.ajax({
-            url: 'http://localhost:8080/job2/all',
+            url: 'http://localhost:8080/jobs/all',
             dataType: 'json',
             success: function(data) {
                 this.setState({allJobs: data});

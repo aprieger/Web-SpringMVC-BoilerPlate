@@ -22,10 +22,11 @@ class Jobs extends React.Component {
     
 };
 
-class JobsMap extends React.Component {
+class JobsTree extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+        		sor: [],
             jobs: [],
             topJobs: [],
             drawnJobs: [],
@@ -40,7 +41,7 @@ class JobsMap extends React.Component {
     
     _loadJobs() {
         $.ajax({
-            url: 'http://localhost:8080/job2/all',
+            url: 'http://localhost:8080/jobs/all',
             dataType: 'json',
             success: function(data) {
                 this.setState({jobs: data});
@@ -143,7 +144,7 @@ class JobsMap extends React.Component {
         context.fillStyle = "#000";
         context.font = "30px Arial";
         context.textAlign="center"; 
-        context.fillText("Triumph", sorX, sorY);
+        context.fillText("Title", sorX, sorY);
         
         context.closePath();
     }
@@ -352,6 +353,33 @@ class JobsMap extends React.Component {
     render() {
         return (
             <div>
+		        <div className="info">
+		            <h3>3) Job Map Example</h3>
+		            <h4>ReactJS View, with MongoDB model, and REST API</h4>
+		            <p>The view is a canvas that is manipulated throught ReactJS, similar to example 2</p>
+		            <p>ReactJS draws a grid, and dynamically draws the nodes and the lines based on the dependencies of the job data received from the API</p>
+		            <p>Hidden job information corresponds to each node, that shows when the user hovers, and uses JQuery to follow the user mouse</p>
+		        </div>
+		        <div>
+		        		<table className="table table-condensed legend">
+		        		  <tr>
+		        		  	<td className="legend-td" style={{backgroundColor: '#70f441'}}></td>
+		        		    <td className="legend-td">Job Completed</td>
+		        		  </tr>
+		        		  <tr>
+		        		  	<td className="legend-td" style={{backgroundColor: '#f4dc42'}}></td>
+		        		    <td className="legend-td">Job In Progress</td>
+		        		  </tr>
+		        		  <tr>
+		        		  	<td className="legend-td" style={{backgroundColor: '#f45f41'}}></td>
+		        		    <td className="legend-td">Job Failed</td>
+		        		  </tr>
+		        		  <tr>
+		        		  	<td className="legend-td" style={{backgroundColor: '#eee'}}></td>
+		        		    <td className="legend-td">Job Did Not Run</td>
+		        		  </tr>
+		        		</table>
+		        </div>
                 {this._renderNodes()}
                 {this.state.nodes.map(function(node) {
                     console.log(node.ref);
@@ -373,14 +401,15 @@ class JobsMap extends React.Component {
                         </div>
                     );
                 })}
+                {}
             </div>
         );
     }
 }
 //Create a new Map object from the React class Component, and add it to the DOM
 ReactDOM.render(
-    <JobsMap />,
-    document.getElementById('reactJobsMap')
+    <JobsTree />,
+    document.getElementById('reactJobsTree')
 );
 
 //Handle the user hovering over a particular node
@@ -420,10 +449,10 @@ function resizeCanvas() {
     canvas.width = window.innerWidth*.9;
     
     //clear the contents and rerender the Map
-    document.getElementById('reactJobsMap').innerHTML = "";
+    document.getElementById('reactJobsTree').innerHTML = "";
     ReactDOM.render(
-    <JobsMap />,
-    document.getElementById('reactJobsMap')
+    <JobsTree />,
+    document.getElementById('reactJobsTree')
 );
 }
 

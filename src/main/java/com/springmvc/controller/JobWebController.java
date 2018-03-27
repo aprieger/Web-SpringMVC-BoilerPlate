@@ -32,6 +32,6 @@ public class JobWebController {
 	}
 	@RequestMapping(value = "/map", method = RequestMethod.GET)
 	public String getJobsMap(){
-		return "jobsMap";
+		return "jobsPage";
 	}
 }

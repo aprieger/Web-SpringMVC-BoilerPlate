@@ -7,6 +7,9 @@
         "Jobs": [
           {
             "JobName":"TH0CSITX",
+            "Predecessors": [
+              {"PredName":"PredName1"}
+            ]
             "OutputFiles": [
               {
                 "OutputFileName":"TH0CT.PHTHSITX.D06.NPSITXF.J171201",
