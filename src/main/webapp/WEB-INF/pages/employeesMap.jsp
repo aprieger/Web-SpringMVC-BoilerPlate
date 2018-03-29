@@ -17,7 +17,7 @@
 <body>
     <div id="reactPageHeader"></div>
     <script src="${pageContext.request.contextPath}/resources/js/getPageHeader.js" type = "text/babel"></script>
-    
+    <br>
     <div class="info">
         <h3>2) Employee Map Example</h3>
         <h4>ReactJS View, with MongoDB model, and REST API</h4>

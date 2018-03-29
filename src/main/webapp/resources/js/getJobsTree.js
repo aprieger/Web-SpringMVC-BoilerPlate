@@ -1,4 +1,4 @@
-var canvas = document.getElementById('canvas');
+var canvas = document.getElementById('treeCanvas');
 var context = canvas.getContext('2d');
 context.translate(0.5, 0.5);
 var circles = [];
@@ -90,7 +90,7 @@ class JobsTree extends React.Component {
     
     _drawGrid() {
         context.fillStyle="#000";
-        context.canvas.width = window.innerWidth;
+        context.canvas.width = window.innerWidth*.94;
         context.canvas.height = window.innerHeight * this.state.scale / 100;
         //context.canvas.height = this.state.jobs.length * 100;
         context.beginPath();
@@ -353,36 +353,30 @@ class JobsTree extends React.Component {
     render() {
         return (
             <div>
-		        <div className="info">
-		            <h3>3) Job Map Example</h3>
-		            <h4>ReactJS View, with MongoDB model, and REST API</h4>
-		            <p>The view is a canvas that is manipulated throught ReactJS, similar to example 2</p>
-		            <p>ReactJS draws a grid, and dynamically draws the nodes and the lines based on the dependencies of the job data received from the API</p>
-		            <p>Hidden job information corresponds to each node, that shows when the user hovers, and uses JQuery to follow the user mouse</p>
-		        </div>
-		        <div>
-		        		<table className="table table-condensed legend">
-		        		  <tr>
-		        		  	<td className="legend-td" style={{backgroundColor: '#70f441'}}></td>
-		        		    <td className="legend-td">Job Completed</td>
-		        		  </tr>
-		        		  <tr>
-		        		  	<td className="legend-td" style={{backgroundColor: '#f4dc42'}}></td>
-		        		    <td className="legend-td">Job In Progress</td>
-		        		  </tr>
-		        		  <tr>
-		        		  	<td className="legend-td" style={{backgroundColor: '#f45f41'}}></td>
-		        		    <td className="legend-td">Job Failed</td>
-		        		  </tr>
-		        		  <tr>
-		        		  	<td className="legend-td" style={{backgroundColor: '#eee'}}></td>
-		        		    <td className="legend-td">Job Did Not Run</td>
-		        		  </tr>
-		        		</table>
-		        </div>
+                <div>
+                    <table className="table table-condensed legend">
+                        <tbody>
+                            <tr>
+                                <td className="legend-td" style={{backgroundColor: '#70f441'}}></td>
+                                <td className="legend-td">Job Completed</td>
+                            </tr>
+                            <tr>
+                                <td className="legend-td" style={{backgroundColor: '#f4dc42'}}></td>
+                                <td className="legend-td">Job In Progress</td>
+                            </tr>
+                            <tr>
+                                <td className="legend-td" style={{backgroundColor: '#f45f41'}}></td>
+                                <td className="legend-td">Job Failed</td>
+                            </tr>
+                            <tr>
+                                <td className="legend-td" style={{backgroundColor: '#eee'}}></td>
+                                <td className="legend-td">Job Did Not Run</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 {this._renderNodes()}
                 {this.state.nodes.map(function(node) {
-                    console.log(node.ref);
                     var nodeId = node.id;
                     return (
                         <div id={nodeId+"-content"} 
@@ -428,7 +422,7 @@ canvas.onmousemove = function (e) {
         context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
         if (context.isPointInPath(x, y)) {
             $('#'+circle.id+'-content').css('left', x+"px");
-            $('#'+circle.id+'-content').css('top', y+260+"px");
+            $('#'+circle.id+'-content').css('top', y+"px");
             $('#'+circle.id+'-content').css('display', 'block');
             break;
         }
