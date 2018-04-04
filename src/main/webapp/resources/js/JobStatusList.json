@@ -1,0 +1,303 @@
+[
+  { "sorName":"Triumph",
+    "platforms": [
+      { "platformName": "ARDW",
+        "jobs": [
+          { "jobName":"TH0CSI01",
+            "jobStatus" : [
+              { "jobNumber":"JOB30057",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.53.19",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              { "jobNumber":"JOB30088",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.52.44",
+                "schedule":"TRI124",
+                "status":"Completed"
+              }
+            ],
+            "predecessors": [
+              { "jobName":"TH0CSITX" },
+			  			{ "jobName":"TH0CSITM" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHSI01.D06.NPSI01F.J171201",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+          { "jobName":"TH0CSITX",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB25213",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.22.05",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB25246",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.23.53",
+                "schedule":"TRI123",
+                "status":"Completed"
+              }
+            ],
+            "predecessors": [
+              { "jobName":"TH0CUPRM" },
+			  			{ "jobName":"TH0CSITM" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHSITX.D06.NPSITXF.J171201",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+          { "jobName":"TH0CUPRM",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB19974",
+                "runDate":"22 MAR 2018",
+                "runTime":"23.59.25",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB20045",
+                "runDate":"23 MAR 2018",
+                "runTime":"23.58.13",
+                "schedule":"TRI123",
+                "status":"In-Progress"
+              }
+            ],
+            "predecessors": [
+              { "jobName":"TH0CSIEN" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHUPRM.D06.NPSI06F.J171201",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+          { "jobName":"TH0CSITM",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB27540",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.36.42",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB28656",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.37.32",
+                "schedule":"TRI123",
+                "status":"Completed"
+              }
+            ],
+            "predecessors": [
+              { "jobName":"TH0CUPRM" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHSITM.D06.NPSI13F.J171201",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+          { "jobName":"TH0CSIEN",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB29549",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.26.56",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB31934",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.24.12",
+                "schedule":"TRI123",
+                "status":"Failed"
+              }
+            ],
+            "predecessors": [
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHSIEN.D06.NPSIENF.J171201",
+                "outputFileType":"Flat File"
+              }
+            ]
+          }
+        ]
+      },
+      { "platformName":"IDN",
+        "jobs": [
+          { "jobName":"TH0CIXPU",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB30343",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.53.19",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB31674",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.52.44",
+                "schedule":"TRI124",
+                "status":"Completed"
+              }
+            ],
+            "predecessors": [
+              { "jobName":"TH0CIX2N" },
+              { "jobName":"TH0CSISG" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHIXPU.D06.NPIX41.USA",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+          { "jobName":"TH0CIX2N",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB26834",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.22.05",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+							{
+                "jobNumber":"JOB27803",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.23.53",
+                "schedule":"TRI123",
+                "status":"Completed"
+              }
+            ],
+            "predecessors": [
+			  { "jobName":"TH0CSIEN" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHIX2N.D06.NPIX07F.BHTU.G0001V00",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+		  { "jobName":"TH0CSISG",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB19830",
+                "runDate":"22 MAR 2018",
+                "runTime":"00.34.25",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB20180",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.58.13",
+                "schedule":"TRI123",
+                "status":"In-Progress"
+              }
+            ],
+            "predecessors": [
+			  { "jobName":"TH0CIX2C" }
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHSISG.D06.NPSIPBF.G0001V00",
+                "outputFileType":"Flat File"
+              }
+            ]
+          },
+		  { "jobName":"TH0CIX2C",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB27489",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.36.42",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB28205",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.37.32",
+                "schedule":"TRI123",
+                "status":"Failed"
+              }
+            ],
+            "predecessors": [
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHIX2C.D06.NPIX01F.BHTU.G0001V00",
+                "outputFileType":"Flat File"
+              }
+            ]
+          }
+		]
+	  },
+	  { "platformName":"GRMS",
+	    "jobs": [
+		  { "jobName":"TH0CTP5G",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB30489",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.53.19",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB30989",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.52.44",
+                "schedule":"TRI124",
+                "status":"Completed"
+              }
+            ],
+            "predecessors": [
+          	  {"jobName": "TH0CSIPV"}
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHTP5G.D06.NPTP05F.G0001V00",
+                "outputFileType":"Flat File"
+              }
+            ]
+					},
+		  { "jobName":"TH0CSIPV",
+            "jobStatus" : [
+              {
+                "jobNumber":"JOB25778",
+                "runDate":"23 MAR 2018",
+                "runTime":"00.22.05",
+                "schedule":"TRI123",
+                "status":"Completed"
+              },
+              {
+                "jobNumber":"JOB25937",
+                "runDate":"24 MAR 2018",
+                "runTime":"00.23.53",
+                "schedule":"TRI123",
+                "status":"In-Progress"
+              }
+            ],
+            "predecessors": [
+			  {"jobName": "TH0CIX2C"}
+            ],
+            "outputFiles": [
+              { "outputFileName":"TH0CT.PHTHSIPV.D06.NPSIPVF.DNEGF.G0001V00",
+                "outputFileType":"Flat File"
+              }
+            ]
+          }
+				]
+		  }
+		]
+  }
+]

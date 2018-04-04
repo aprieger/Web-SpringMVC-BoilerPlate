@@ -2,26 +2,19 @@ var canvas = document.getElementById('mapCanvas');
 var context = canvas.getContext('2d');
 var circles = [];
 
-var p = $('#canvasStart');
-var position = p.position();
-var canvasY0 = position.top;
-var canvasX0 = position.left;
-
 class JobsMap extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             jobs: [],
             nodes: [],
-            scale: 220,
+            scale: 80,
             nodeLineCount: 0,
-            nodeX: -.3,
-            nodeY: .7,
+            nodeX: 0,
+            nodeY: 1,
             nodeDirection: "right",
             nodeRadius: 10,
-            nodeLineWidth: 5,
-            boxWidth: 180,
-            boxHeight: 180
+            nodeLineWidth: 3
         };
     }
     _loadJobs() {
@@ -40,27 +33,42 @@ class JobsMap extends React.Component {
     _drawGrid() {
         context.fillStyle="#000";
         context.canvas.width = window.innerWidth*.94;
-        var windowHeight = ((this.state.boxWidth)*this.state.jobs.length)/(window.innerWidth/600);
-        context.canvas.height = windowHeight;
+        context.canvas.height = window.innerHeight;
+        /*context.beginPath();
+        var scale = this.state.scale;
+        var height = window.innerHeight*scale;
+        var width = window.innerWidth*scale;
+        var counter=0;
+        for (var x = .5; x < width; x+=scale) {
+            context.moveTo(x,0);
+            if (counter<10)
+                context.fillText(counter++,x-9,10);
+            else if (counter<100)
+                context.fillText(counter++,x-13,10);
+            else if (counter<1000)
+                context.fillText(counter++,x-16,10);
+            context.moveTo(x,0);
+            context.lineTo(x,height);
+        }
+        context.moveTo(width-.5,0);
+        context.lineTo(width-.5, 50);
+        counter =0;
+        for (var y=.5; y < height; y+=scale) {
+            context.moveTo(0,y);
+            context.fillText(counter++,0,y-8);
+            context.moveTo(0,y);
+            context.lineTo(height,y);
+        }
+        context.moveTo(0, height-.5);
+        context.lineTo(width, height-.5);
+        context.strokeStyle = "#eee";
+        context.lineWidth = 1;
+        context.stroke();
+        context.fill();
+        context.closePath();*/
     }
-    _drawNode(job) {
-        var self = this;
-        var status;
-        var color = '#ddd';
-        if (job.state === 0) {
-            color = "#f4dc42";
-            status = "Job In Progress";
-        }
-        else if (job.state === 1) {
-            color = "#70f441";
-            status = "Job Completed";
-        }
-        else if (job.state === 2) {
-            color = "#f45f41";
-            status = "Job Failed";
-        }
-            
-        if (canvas.width < (this.state.nodeLineCount+2)*this.state.scale*.85) {
+    _drawNode(fill, job) {
+        if (canvas.width < (this.state.nodeLineCount+2)*this.state.scale) {
             this.state.nodeLineCount=0;
             this.state.nodeY++;
             this._drawLoopBackLine();
@@ -82,10 +90,34 @@ class JobsMap extends React.Component {
         context.strokeStyle = "#000";
         context.lineWidth=this.state.nodeLineWidth;
         context.arc(x, y, this.state.nodeRadius, 0, 2 * Math.PI);
-        context.fillStyle = color;
+        context.fillStyle = fill;
         context.fill();
         context.stroke();
+
+        context.fillStyle = "#777";
+        var jobLabel = job.category + "/" + job.ref;
+        if (jobLabel.length > 15) {
+            jobLabel = jobLabel.substring(0,15) + "...";
+        }
+        context.textAlign="center"; 
+        context.font = this.state.scale/6 + "px Arial";
+        if (this.state.nodes.length%2 > 0)
+            context.fillText(jobLabel, x, y + (this.state.nodeRadius*2.5));
+        else
+            context.fillText(jobLabel, x, y - (this.state.nodeRadius*2.5));
+        context.stroke();
 	    	
+        var self = this;
+        var status;
+        if (job.state === 0) {
+            status = "Job In Progress";
+        }
+        else if (job.state === 1) {
+            status = "Job Completed";
+        }
+        else if (job.state === 2) {
+            status = "Job Failed";
+        }
         this.state.nodes.push({
             id: x + "-" + y,
             jobId: job.id,
@@ -97,9 +129,7 @@ class JobsMap extends React.Component {
             dependencies: job.dependencies,
             x: x,
             y: y,
-            color: color,
-            radius: self.state.nodeRadius,
-            boxWidth: self.state.boxWidth
+            radius: self.state.nodeRadius
         });
         this.state.nodeLineCount++;
     }
@@ -116,11 +146,12 @@ class JobsMap extends React.Component {
             context.moveTo(lineX, lineY);
             context.lineTo(lineX + this.state.scale, lineY);
         }
-        context.globalCompositeOperation='destination-over';
-        context.strokeStyle = "#000";
-        context.lineWidth=this.state.nodeLineWidth;
-        context.stroke();
-        context.globalCompositeOperation='source-over';
+	    	context.globalCompositeOperation='destination-over';
+	    	context.strokeStyle = "#000";
+	    	context.lineWidth=this.state.nodeLineWidth;
+	    	context.stroke();
+	    	context.globalCompositeOperation='source-over';
+
     }
     
     _drawLoopBackLine(){
@@ -143,13 +174,20 @@ class JobsMap extends React.Component {
     _addNodes(){
         let self = this;
         this.state.jobs.map(function(job) {
-            self._drawNode(job);
+            var color = '#ddd';
+            if (job.state === 1)
+                color = '#70f441';
+            else if (job.state === 0)
+                color = '#f4dc42';
+            else if (job.state === 2)
+                color = '#f45f41';
+            self._drawNode(color, job);
         });
         circles = this.state.nodes;
     }
     componentWillMount() {
         this._loadJobs();
-        
+        this._drawGrid();
     }
     componentDidMount() {
 
@@ -179,37 +217,21 @@ class JobsMap extends React.Component {
                         </tbody>
                     </table>
                 </div>
-                {this._drawGrid()}
                 {this._addNodes()}
                 {this.state.nodes.map(function(node) {
                     var nodeId = node.id;
                     return (
-                        <div>
-                            <div id={nodeId+"-content"} className="map-content" 
-                                key={nodeId+"-content"} 
-                                style={{left: node.x+canvasX0-(node.boxWidth/2), 
-                                    top: node.y+canvasY0-(node.boxWidth/2),
-                                    width: node.boxWidth,
-                                    height: node.boxWidth}}>
-                                <table className="table table-condensed">
-                                        <tr>
-                                            <td style={{backgroundColor: node.color, padding: '.5em'}}></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div style={{textDecoration: "underline", weight: "600"}}>Job: {node.ref}</div>
-                                                <div>Platform: {node.category}</div>  
-                                                <div>Status: {node.status}</div>
-                                                <div>Dependencies:</div>
-                                                {node.dependencies.map(function(ref) {
-                                                    return (
-                                                    <div>{ref.ref}</div>
-                                                    );
-                                                })}
-                                            </td>
-                                        </tr>
-                                </table>
-                            </div>
+                        <div id={nodeId+"-content"} className="dropdown-content" key={nodeId+"-content"} style={{left: node.x, top: node.y}}>
+	                        <div>Platform: {node.category}</div>
+	                        <div>Job Name: {node.ref}</div>
+	                        <div>Job Status: {node.status}</div>
+	                        <div>Dependencies:</div>
+	                        {node.dependencies.map(function(ref) {
+	                        	return (
+	                                //<div>{JSON.parse(ref).ref}</div>
+	                                <div>{ref.ref}</div>
+	                            );
+	                        })}
                         </div>
                     );
                 })}
@@ -222,6 +244,28 @@ ReactDOM.render(
     document.getElementById('reactJobsMap')
 );
 
+//Handle the user hovering over a particular node
+//Display a dropdown content box with the relevant information
+//that follows the users mouse
+canvas.onmousemove = function (e) {
+    for (var i=0; i<circles.length; i++) {
+        $('#'+circles[i].id+'-content').css('display', 'none');
+    }
+    var rect = canvas.getBoundingClientRect(),
+    x = e.clientX - rect.left,
+    y = e.clientY - rect.top,
+    i = 0, circle;
+    while(circle = circles[i++]) {
+        context.beginPath();
+        context.arc(circle.x, circle.y, circle.radius, 0, 2*Math.PI);
+        if (context.isPointInPath(x, y)) {
+            $('#'+circle.id+'-content').css('left', x+"px");
+            $('#'+circle.id+'-content').css('top', y+"px");
+            $('#'+circle.id+'-content').css('display', 'block');
+            break;
+        }
+    }
+};
 //call the addResizeCanvasListner to handle when the user changes the size of
 //the window
 addResizeCanvasListener();
@@ -229,16 +273,12 @@ function addResizeCanvasListener() {
     window.addEventListener('resize', resizeCanvas, false);
     resizeCanvas();
 };
-
 function resizeCanvas() {   
     //clear the contents and rerender the Map
     document.getElementById('reactJobsMap').innerHTML = "";
     ReactDOM.render(
     <JobsMap />,
-    document.getElementById('reactJobsMap'));
-    var elements = document.querySelectorAll('.map-content');
-    for(var i=0; i<elements.length; i++){
-        elements[i].style.display = "block";
-    }
+    document.getElementById('reactJobsMap')
+);
 };
 
