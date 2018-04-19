@@ -71,14 +71,6 @@ class JobsTree extends React.Component {
                     status: job.jobStatus[newestStatus].status,
                     predecessors: job.predecessors
                 });
-                /*alert(platform.platformName
-                		 + ", " + job.jobName
-                		 + ", " + job.jobStatus[newestStatus].jobNumber
-                		 + ", " + job.jobStatus[newestStatus].runDate
-                		 + ", " + job.jobStatus[newestStatus].runTime
-                		 + ", " + job.jobStatus[newestStatus].schedule
-                		 + ", " + job.jobStatus[newestStatus].status
-                		 + ", " + job.predecessors);*/
             });
         });
         
